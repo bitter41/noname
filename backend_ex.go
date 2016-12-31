@@ -58,7 +58,7 @@ func main() {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
 		if _, ok := Activities[ update.Message.From.ID ]; ok {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "work already started by " + strconv.Itoa( update.Message.From.ID))
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "work already started by " + strconv.Itoa( update.Message.From.ID) )
 			bot.Send(msg)
 		} else {
 			Activities[ update.Message.From.ID ] = &Activity{time.Now(), "work", update.Message.From.UserName }
