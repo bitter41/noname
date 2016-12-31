@@ -8,18 +8,17 @@ import (
 	"strconv"
 )
 
-
-const bot_token  = "317035683:AAFvveEwHzO1wy-Rdqj6jCBjBI4msED2CLc"
+const bot_token = "317035683:AAFvveEwHzO1wy-Rdqj6jCBjBI4msED2CLc"
 
 type Activity struct {
-	StartDateTime 	time.Time
-	Type 		string
-	Usermane	string
+	StartDateTime time.Time
+	Type          string
+	UserName      string
 }
 
 type User struct {
-	UserID 		int
-	Username 	string
+	UserID   int
+	Username string
 }
 
 func (u User) isDbSynced() int {
@@ -33,9 +32,9 @@ func (u User) updateInDB() int {
 }
 
 func main() {
-	Activities := make( map[int]*Activity )
+	Activities := make(map[int]*Activity)
 
-	bot, err := tgbotapi.NewBotAPI( bot_token )
+	bot, err := tgbotapi.NewBotAPI(bot_token)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -69,11 +68,5 @@ func main() {
 		//msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 		//msg.ReplyToMessageID = update.Message.MessageID
 
-
 	}
 }
-
-
-
-
-
