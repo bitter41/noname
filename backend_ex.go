@@ -5,34 +5,17 @@ import "log"
 import "time"
 import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
-	"strconv"
+)
+import (
+	"./types"
+	"fmt"
+	"regexp"
 )
 
 const bot_token = "317035683:AAFvveEwHzO1wy-Rdqj6jCBjBI4msED2CLc"
 
-type Activity struct {
-	StartDateTime time.Time
-	Type          string
-	UserName      string
-}
-
-type User struct {
-	UserID   int
-	Username string
-}
-
-func (u User) isDbSynced() int {
-
-	return 1
-}
-
-func (u User) updateInDB() int {
-
-	return 1
-}
-
 func main() {
-	Activities := make(map[int]*Activity)
+	//Activities := make(map[int]*types.Activity)
 
 	bot, err := tgbotapi.NewBotAPI(bot_token)
 	if err != nil {
@@ -50,23 +33,68 @@ func main() {
 	updates.Clear()
 
 	for update := range updates {
+		if update.CallbackQuery != nil {
+			switch update.CallbackQuery.Data {
+			case types.WORK:
+			case types.RELAX:
+			case types.EAT:
+			}
+		}
+
 		if update.Message == nil {
 			continue
 		}
 
-		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+		user := types.User{
+			Id:       update.Message.From.ID,
+			UserName: update.Message.From.FirstName,
+		}
+		chatId := update.Message.Chat.ID
+		text := update.Message.Text
 
-		if _, ok := Activities[ update.Message.From.ID ]; ok {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "work already started by " + strconv.Itoa( update.Message.From.ID) )
-			bot.Send(msg)
-		} else {
-			Activities[ update.Message.From.ID ] = &Activity{time.Now(), "work", update.Message.From.UserName }
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "work start for " + strconv.Itoa( update.Message.From.ID))
+		log.Printf("[%s] %d %d %s", user.UserName, user.Id, chatId, text)
+
+
+
+		command := regexp.MustCompile("/[a-z]+").FindString(update.Message.Text)
+
+		switch command {
+		case "/start":
+			startButton := tgbotapi.NewInlineKeyboardButtonData(types.WORK, types.WORK)
+			relaxButton := tgbotapi.NewInlineKeyboardButtonData(types.RELAX, types.RELAX)
+			eatButton := tgbotapi.NewInlineKeyboardButtonData(types.EAT, types.EAT)
+
+			inlineKeyboard := []tgbotapi.InlineKeyboardButton {
+				startButton,
+				relaxButton,
+				eatButton,
+			}
+			inlineKeyboardMarkup := tgbotapi.NewInlineKeyboardMarkup(inlineKeyboard)
+
+			response := tgbotapi.NewMessage(chatId, "Please select what activity you want to start.")
+			response.BaseChat.ReplyMarkup = inlineKeyboardMarkup
+			response.ParseMode = tgbotapi.ModeMarkdown
+
+			bot.Send(response)
+		case "/help":
+			msg := tgbotapi.NewMessage(chatId, "To start activity print '/start'")
 			bot.Send(msg)
 		}
 
-		//msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		//msg.ReplyToMessageID = update.Message.MessageID
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
+
+
+		var reply string
+		msg := tgbotapi.NewMessage(chatId, "")
+		if update.Message.NewChatMember != nil {
+			reply = fmt.Sprintf("Hi @%s! Welcome to debug bot. Keep calm and eat a cookie (:",
+				update.Message.NewChatMember.FirstName)
+		}
+
+		if reply != "" {
+			msg.Text = reply
+			bot.Send(msg)
+		}
 
 	}
 }
