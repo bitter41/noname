@@ -10,6 +10,7 @@ import (
 	"./types"
 	"fmt"
 	"regexp"
+	"github.com/noname/services"
 )
 
 const bot_token = "317035683:AAFvveEwHzO1wy-Rdqj6jCBjBI4msED2CLc"
@@ -32,10 +33,19 @@ func main() {
 	time.Sleep(time.Millisecond * 500)
 	updates.Clear()
 
+	activityService := services.ActivityService{
+		Bot: bot,
+	}
+
 	for update := range updates {
 		if update.CallbackQuery != nil {
+
+			activityService.Update = update
+
 			switch update.CallbackQuery.Data {
 			case types.WORK:
+				act := activityService.GetActivity(types.WORK)
+				activityService.Start(act)
 			case types.RELAX:
 			case types.EAT:
 			}

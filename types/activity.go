@@ -5,23 +5,24 @@ import "time"
 type Activity struct {
 	id             int
 	ActivityType   string
-	startDateTime  time.Time
-	stopDateTime   time.Time
+	StartDateTime  time.Time
+	StopDateTime   time.Time
 	event          Event
-	user           User
+	User           User
 	ActivityConfig ActivityConfig
+	Launched       bool
 }
 
 const (
-	WORK = "work"
-	EAT = "eat"
-	RELAX = "relax"
+	WORK   = "work"
+	EAT    = "eat"
+	RELAX  = "relax"
 	CUSTOM = "custom"
 )
 
 type ActivityConfig struct {
 	id         int
 	activityId int
-	Duration   int64
-	ChunkSize  int64
+	Duration   time.Duration
+	ChunkSize  time.Duration
 }
