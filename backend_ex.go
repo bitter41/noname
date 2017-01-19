@@ -4,13 +4,12 @@ package main
 import "log"
 import "time"
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
-)
-import (
 	"./types"
 	"fmt"
-	"regexp"
+	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/noname/adapter"
 	"github.com/noname/services"
+	"regexp"
 )
 
 const bot_token = "317035683:AAFvveEwHzO1wy-Rdqj6jCBjBI4msED2CLc"
@@ -33,8 +32,12 @@ func main() {
 	time.Sleep(time.Millisecond * 500)
 	updates.Clear()
 
+	db := adapter.GetDB()
+	activityDAO := adapter.NewActivityDAO(db)
+
 	activityService := services.ActivityService{
 		Bot: bot,
+		ActivityDAO: activityDAO,
 	}
 
 	for update := range updates {
@@ -108,3 +111,5 @@ func main() {
 
 	}
 }
+
+

@@ -3,7 +3,7 @@ package types
 import "time"
 
 type Activity struct {
-	id             int
+	Id             int
 	ActivityType   string
 	StartDateTime  time.Time
 	StopDateTime   time.Time
@@ -21,7 +21,7 @@ const (
 )
 
 type ActivityConfig struct {
-	id         int
+	Id         int
 	activityId int
 	Duration   time.Duration
 	ChunkSize  time.Duration
